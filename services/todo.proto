@@ -1,0 +1,69 @@
+syntax = "proto3";
+package services;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message IdMessage {
+    int32 id = 1;
+}
+
+message TodoMessage {
+    int32 id = 1;
+    string task = 2;
+    bool done = 3;
+}
+
+message TodoArray {
+    repeated TodoMessage todos = 1;
+    int32 total = 2;
+}
+
+message TodoFilter {
+    int32 offset = 1;
+    int32 limit = 2;
+    string terms = 3;
+    // 0 for all, 1 for done, 2 for undone
+    int32 done = 4;
+}
+
+service TodoService {
+    rpc CreateTodo(TodoMessage) returns (TodoMessage) {
+        option (google.api.http) = {
+            post: "/todos"
+            body: "*"
+        };
+    }
+
+    rpc ListTodos(TodoFilter) returns (TodoArray) {
+        option (google.api.http) = {
+            get: "/todos"
+        };
+    }
+
+    rpc GetTodo(IdMessage) returns (TodoMessage) {
+        option (google.api.http) = {
+            get: "/todos/{id}"
+        };
+    }
+
+    rpc SetAsDone(IdMessage) returns (TodoMessage) {
+        option (google.api.http) = {
+            put: "/todos/{id}/done"
+            body: "*"
+        };
+    }
+
+    rpc SetAsUndone(IdMessage) returns (TodoMessage) {
+        option (google.api.http) = {
+            put: "/todos/{id}/undone"
+            body: "*"
+        };
+    }
+
+    rpc DeleteTodo(IdMessage) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/todos/{id}"
+        };
+    }
+}
